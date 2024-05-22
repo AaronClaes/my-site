@@ -1,4 +1,6 @@
 import "@/styles/globals.css";
+import "fumadocs-ui/style.css";
+import { RootProvider } from "fumadocs-ui/provider";
 
 import { GeistSans } from "geist/font/sans";
 
@@ -15,7 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body>{children}</body>
+      <body>
+        <RootProvider>{children}</RootProvider>
+      </body>
     </html>
   );
 }
