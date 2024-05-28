@@ -1,3 +1,4 @@
+"use client";
 export const canvas_file = `import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { MyMesh } from "./my-mesh";
@@ -15,7 +16,7 @@ export default function App() {
 
 export const my_mesh_three_texture_loader = `import * as THREE from "three";
 export function MyMesh() {
-    const texture = new THREE.TextureLoader().load("${window.location.origin}/react.webp");
+    const texture = new THREE.TextureLoader().load("https://raw.githubusercontent.com/AaronClaes/my-site/main/public/react.webp");
             
     return (
         <mesh>
@@ -30,7 +31,7 @@ import { useState } from "react";
 
 export function MyMesh() {
     const [scale, setScale] = useState(1);
-    const texture = new THREE.TextureLoader().load("${window.location.origin}/react.webp");
+    const texture = new THREE.TextureLoader().load("https://raw.githubusercontent.com/AaronClaes/my-site/main/public/react.webp");
   
     const handleClick = () => setScale(p => p + 0.1);
   
@@ -48,7 +49,7 @@ export const my_mesh_use_loader = `import * as THREE from "three";
   
   export function MyMesh() {
       const [scale, setScale] = useState(1);
-      const texture = useLoader(THREE.TextureLoader, "${window.location.origin}/react.webp");
+      const texture = useLoader(THREE.TextureLoader, "https://raw.githubusercontent.com/AaronClaes/my-site/main/public/react.webp");
     
       const handleClick = () => setScale(p => p + 0.1);
     
@@ -113,7 +114,7 @@ export const my_scene_on_click_react_cube = `import * as THREE from "three";
 import { useLoader } from "@react-three/fiber";
 
 export function ReactCube(props) {    
-  const texture = useLoader(THREE.TextureLoader, "${window.location.origin}/react.webp");
+  const texture = useLoader(THREE.TextureLoader, "https://raw.githubusercontent.com/AaronClaes/my-site/main/public/react.webp");
 
   return (
     <mesh position={[-1, 0, 0]} {...props}>
@@ -127,7 +128,7 @@ export const my_scene_on_click_three_cube = `import * as THREE from "three";
 import { useLoader } from "@react-three/fiber";
 
 export function ThreeCube(props) {    
-  const texture = useLoader(THREE.TextureLoader, "${window.location.origin}/three.png");
+  const texture = useLoader(THREE.TextureLoader, "https://raw.githubusercontent.com/AaronClaes/my-site/main/public/three.png");
 
   return (
     <mesh position={[1, 0, 0]} {...props}>
@@ -151,7 +152,7 @@ const maps = [
 
 export function MyMesh() {
   const [index, setIndex] = useState(0);
-  const texture = useLoader(THREE.TextureLoader, "${window.location.origin}" + maps[index]);
+  const texture = useLoader(THREE.TextureLoader, "https://raw.githubusercontent.com/AaronClaes/my-site/main/public" + maps[index]);
 
   return (
     <mesh
@@ -180,7 +181,7 @@ export function MyMesh() {
   const [index, setIndex] = useState(0);
   const [mapPath, setMapPath] = useState(maps[index]);
   const [isPending, startTransition] = useTransition();
-  const texture = useLoader(THREE.TextureLoader, "${window.location.origin}" + mapPath);
+  const texture = useLoader(THREE.TextureLoader, "https://raw.githubusercontent.com/AaronClaes/my-site/main/public" + mapPath);
 
   useEffect(() => {
     startTransition(() => {
@@ -213,7 +214,7 @@ const maps = [
 
 export function MyMesh() {
   const [index, setIndex] = useState(0);
-  const mapPath = useDeferredValue("${window.location.origin}" + maps[index]);
+  const mapPath = useDeferredValue("https://raw.githubusercontent.com/AaronClaes/my-site/main/public" + maps[index]);
   const texture = useLoader(THREE.TextureLoader, mapPath);
 
   return (
