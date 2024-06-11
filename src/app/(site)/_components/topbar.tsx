@@ -1,7 +1,10 @@
+import { getPages } from "@/app/source";
 import { SiGithub, SiLinkedin, SiX } from "@icons-pack/react-simple-icons";
 import Link from "next/link";
 
 export default function Topbar() {
+  const blogsCount = getPages().filter((b) => b.slugs.length > 1).length;
+
   return (
     <div className="flex px-3 pt-4">
       <nav className="flex items-center gap-2">
@@ -10,6 +13,9 @@ export default function Topbar() {
         </Link>
         <Link className="button" href="/blogs">
           Blogs
+          <div className="ml-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs">
+            {blogsCount}
+          </div>
         </Link>
       </nav>
       <div className="ml-auto flex">
