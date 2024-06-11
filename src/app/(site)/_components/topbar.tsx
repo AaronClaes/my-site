@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Topbar() {
   return (
-    <div className="flex px-3 py-4">
+    <div className="flex px-3 pt-4">
       <nav className="flex items-center gap-2">
         <Link href="/" className="border-r pr-4">
           Aaron Claes.
