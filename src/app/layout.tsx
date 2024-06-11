@@ -17,7 +17,7 @@ export default function RootLayout({
     <html
       style={{ colorScheme: "dark" }}
       lang="en"
-      className={`${GeistSans.variable} `}
+      className={`${GeistSans.variable} dark`}
     >
       <body>
         <>{children}</>
