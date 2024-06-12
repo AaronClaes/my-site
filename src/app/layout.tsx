@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   title: "Aaron Claes",
@@ -21,6 +22,7 @@ export default function RootLayout({
     >
       <body>
         <>{children}</>
+        <Analytics />
       </body>
     </html>
   );

@@ -4,7 +4,6 @@ import Link from "next/link";
 
 export default function Topbar() {
   const blogsCount = getPages().filter((b) => b.slugs.length > 1).length;
-  console.log(getPages());
 
   return (
     <div className="flex px-3 pt-4">
