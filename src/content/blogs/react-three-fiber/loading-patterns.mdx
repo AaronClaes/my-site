@@ -197,7 +197,7 @@ function MyMesh() {
 }
 ```
 
-the useLoader hook requires two arguments:
+the `useLoader` hook requires two arguments:
 
 - A loader (e.g. `TextureLoader`, `GLTFLoader`)
 - The path to the file you want to load
@@ -209,7 +209,7 @@ the useLoader hook requires two arguments:
   this blog](#extend-loaders).
 </Callout>
 
-Before we take a look how the useLoader hook works, let's make sure the two problems we had with the Three.js way are actually solved.
+Before we take a look how the `useLoader` hook works, let's make sure the two problems we had with the Three.js way are actually solved.
 
 1. The texture is recreated on every re-render
 2. The image is refetched on every re-render
@@ -234,7 +234,7 @@ export function MyMesh() {
 
 <Callout type="info">
   An important sidenote is that `MyMesh` will still re-render on each click.
-  This is how React works and is required to display the new scaled mesh.
+  This is how React works and it is required to display the new scaled mesh.
 </Callout>
 
 <SandpackUseLoader />
@@ -304,9 +304,9 @@ The following will happen:
   the DOM.
 </Callout>
 
-In case of React Three Fiber, we cannot display a fallback UI while loading an asset, because rendering HTML elements inside of a `Canvas` is not possible.
+In case of React Three Fiber, we cannot display a fallback UI while loading an asset, because rendering HTML elements inside of a `Canvas` is not possible. But that doesn't mean that `Suspense` cannot be useful for us.
 
-But that doesn't mean that `Suspense` cannot be useful for us. Everytime `useLoader` loads an **uncached** asset, it will throw a promise, which suspends the application.
+Everytime `useLoader` loads an **uncached** asset, it will throw a promise, which suspends the application.
 This allows us to have full control over the loading states inside our `Canvas`.
 
 <Callout type="info">
@@ -365,7 +365,7 @@ When you click the `ReactCube`, you should notice a problem. If you don't see it
 
 The moment you click on the cube, the texture starts loading and everything dissapears for a brief moment, until the texture finished loading.
 
-Remember the `Suspense` inside the Canvas? It is the reason why this happens. As we learned before, the `Suspense` unmounts its children until the loading is done.
+Remember the `Suspense` inside the Canvas? It is the reason why this happens. As we learned before, the `Suspense` unmounts its children until the loading is done, which includes the `ReactCube`.
 
 To solve this, we need to make sure that only the `ThreeCube` unmounts, since that's the only element related to the loading of the texture.
 
@@ -398,7 +398,7 @@ Click the cube and notice that `ThreeCube` appears when the texture is finished 
 
 The key takeaway from this is that `Suspense` is a powerful tool that allows us to control the loading states of our assets inside the `Canvas`. How you use it is up to you, a few examples:
 
-- Group assets together and only display them when they all loaded.
+- Group assets together and display them when everything loaded (prevent waterfall effect).
 - Display a fallback mesh while the asset is loading.
 
 Unfortunately, `Suspense` is not a perfect solution for all usecases. Lets dive into some more advanced loading patterns where its problems become more clear, and how we can solve them.
@@ -406,7 +406,7 @@ Unfortunately, `Suspense` is not a perfect solution for all usecases. Lets dive 
 ### React 18 hooks
 
 You might have a mesh that requires a different texture based on some state. 3D configurators are a good example of this.
-A few examples:
+A few cases:
 
 - A backpack configurator that allows the customer to choose from different print patterns.
 - A wallpaper configurator with a 3D wall to showcase the chosen pattern.
@@ -442,8 +442,8 @@ We have an array with 5 different textures, and a `MyMesh` component that allows
 
 <SandpackUseLoaderSwitchTexture />
 
-Click the cube a few times and notice the problem. The cube disappears while the new image is being fetched.
-This happens because useLoader doesn't only throw a promise when the first texture is loaded. Each uncached texture will throw a promise.
+Click the cube a few times and notice the problem. The cube disappears while a new image is being fetched.
+This happens because useLoader doesn't only throw a promise when the first texture loads. Each uncached texture will throw a promise.
 
 If you click a few more times until the cycle restarts, you notice that the problem does no longer occur. The textures are now cached and can be displayed instantly.
 
@@ -467,6 +467,8 @@ function MyMesh() {
 While this would improve the user experience slightly, because the cube will stay visible, it is not great. When we would click our cube, the entire material will unmount and remount, which causes our cube to flicker.
 
 The next solution you might try is to give `Suspense` a fallback material. This could slightly decrease the flickering if you match the color with your textures, but still not a great solution.
+
+You could also write your custom logic to save the old texture and show it while the new one is loading, but this can get pretty complex and messy, especially if you need this logic in multiple meshes & components.
 
 Luckily for us, React has two built in hooks that allow us to counter this problem. `useTransition` and `useDeferredValue`.
 
@@ -524,7 +526,7 @@ Let's find out how easy it actually is.
 #### useDeferredValue
 
 <Callout type="info">
-  `useDefferedValue` is an advanced React hook but is very easy to use in
+  `useDeferedValue` is an advanced React hook but is very easy to use in
   combination with `useLoader`. Checkout [the
   docs](https://react.dev/reference/react/useDeferredValue) for more info.
 </Callout>
@@ -555,7 +557,7 @@ That's it, all we have to do is pass our dynamic path to `useDeferredValue` and 
 
 <SandpackUseLoaderSwitchTextureUseDefferedValue />
 
-Need the `isPending` we had with `useTransition`? Just comparing the current path and the deferred path. If they are not equal, we know that the texture is still loading.
+You might want the `isPending` we had with `useTransition`, to notify the user that something is loading. This can be done by comparing the current path and the deferred path. If they are not equal, we know that the texture is still loading.
 
 ```tsx
 const currentPath = maps[textureIndex];
@@ -568,6 +570,10 @@ if (currentPath !== mapPath) {
 ```
 
 Now you see why I prefer `useDeferredValue` over `useTransition`. It is easier to use and understand.
+
+The `useDeferredValue` hook solved most of my problems I had with loading assets. If you did not know about it yet, it will be a gamechanger.
+
+Lets continue learning more awesome features of the `useLoader` hook & React!
 
 ### Preloading
 
@@ -782,7 +788,7 @@ Each type of asset requires a different strategy to load. The `useLoader` hook i
 These hooks are built ontop of the `useLoader` hook, but take specific arguments relevant to the asset type. Lets take a look at a few examples.
 
 <Callout type="info">
-  Because most loader hooks in Drei are wrappers around 'useLoader', everything
+  Because most loader hooks in Drei are wrappers around `useLoader`, everything
   we learned in this blog post still applies.
 </Callout>
 
@@ -860,7 +866,7 @@ More info in [the docs](https://github.com/pmndrs/drei?tab=readme-ov-file#splat)
 
 ### Loading state
 
-Most of us probably played games at some point in our life. Doesnt matter if it is on mobile, console or PC, every game has one thing in common. When you first launch them, a loading screen will be displayed.
+Most of us probably played games at some point in our life. Doesnt matter if it is on mobile, console or PC. Every game has one thing in common. When you first launch them, a loading screen will be displayed.
 
 Thanks to Drei, we can easily do this as well, either with a pre-made or a custom one.
 
@@ -1009,7 +1015,7 @@ function MyApp() {
 }
 ```
 
-This is a very basic example, but I think you can imagine how powerful this library really can be. It allows you to create complex loading screens, overlays, ... from anywhere within your `Canvas`.\_createMdxContent
+This is a very basic example, but I think you can imagine how powerful this library really can be. It allows you to create complex loading screens, overlays, ... from anywhere within your `Canvas`.
 
 ## The end
 
