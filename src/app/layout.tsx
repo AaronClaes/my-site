@@ -1,7 +1,9 @@
 import "@/styles/globals.css";
+import "fumadocs-ui/style.css";
 
 import { GeistSans } from "geist/font/sans";
 import { Analytics } from "@vercel/analytics/react";
+import { RootProvider } from "fumadocs-ui/provider";
 
 export const metadata = {
   title: "Aaron Claes",
@@ -21,8 +23,10 @@ export default function RootLayout({
       className={`${GeistSans.variable} dark`}
     >
       <body>
-        <>{children}</>
-        <Analytics />
+        <RootProvider>
+          <div className="h-[calc(100vh-64px)]">{children}</div>
+          <Analytics />
+        </RootProvider>
       </body>
     </html>
   );

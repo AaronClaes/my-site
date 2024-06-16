@@ -1,9 +1,12 @@
 import { DocsLayout } from "fumadocs-ui/layout";
-import { pageTree } from "@/app/source";
-import type { ReactNode } from "react";
+import { pageTree } from "../source";
 import { SiLinkedin, SiX } from "@icons-pack/react-simple-icons";
 
-export default function RootDocsLayout({ children }: { children: ReactNode }) {
+type SiteDocsLayoutProps = {
+  children: React.ReactNode;
+};
+
+export default function SiteDocsLayout({ children }: SiteDocsLayoutProps) {
   return (
     <DocsLayout
       tree={pageTree}
@@ -11,6 +14,7 @@ export default function RootDocsLayout({ children }: { children: ReactNode }) {
         title: "Aaron Claes",
         githubUrl: "https://github.com/AaronClaes",
       }}
+      sidebar={{ enabled: false }}
       links={[
         {
           text: "X",
@@ -33,6 +37,7 @@ export default function RootDocsLayout({ children }: { children: ReactNode }) {
           active: "nested-url",
         },
       ]}
+      containerProps={{ className: "h-full" }}
     >
       {children}
     </DocsLayout>

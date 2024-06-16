@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import Topbar from "./_components/topbar";
+import { DocsLayout } from "fumadocs-ui/layout";
+import { pageTree } from "../source";
+import { SiLinkedin, SiX } from "@icons-pack/react-simple-icons";
 
 type SiteLayoutProps = {
   children: ReactNode;
@@ -7,9 +9,38 @@ type SiteLayoutProps = {
 
 export default function SiteLayout({ children }: SiteLayoutProps) {
   return (
-    <div className="flex h-screen w-screen flex-col">
-      <Topbar />
-      <main className="h-full w-full p-4">{children}</main>
-    </div>
+    <DocsLayout
+      tree={pageTree}
+      nav={{
+        title: "Aaron Claes",
+        githubUrl: "https://github.com/AaronClaes",
+      }}
+      sidebar={{ enabled: false }}
+      links={[
+        {
+          text: "X",
+          url: "https://x.com/aaronclaes",
+          icon: <SiX />,
+          external: true,
+          type: "secondary",
+        },
+        {
+          text: "LinkedIn",
+          url: "https://www.linkedin.com/in/aaron-claes-618626207/",
+          icon: <SiLinkedin />,
+          external: true,
+          type: "secondary",
+        },
+        {
+          text: "Blogs",
+          url: "/blogs",
+          type: "main",
+          active: "nested-url",
+        },
+      ]}
+      containerProps={{ className: "h-full" }}
+    >
+      <div className="h-full w-screen">{children}</div>
+    </DocsLayout>
   );
 }

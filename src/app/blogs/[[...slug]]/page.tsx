@@ -36,9 +36,15 @@ export function generateMetadata({ params }: { params: { slug?: string[] } }) {
   const page = getPage(params.slug);
 
   if (page == null) notFound();
-
   return {
     title: page.data.title,
     description: page.data.description,
+    openGraph: {
+      title: page.data.title,
+      description: page.data.description,
+      type: "article",
+      url: page.url,
+      images: [`/blogs/og/${page.file.name}.png`],
+    },
   } satisfies Metadata;
 }
