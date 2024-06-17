@@ -1,3 +1,4 @@
+import "@/styles/globals.css";
 import type { ReactNode } from "react";
 import { DocsLayout } from "fumadocs-ui/layout";
 import { pageTree } from "../source";
