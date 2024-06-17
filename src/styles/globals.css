@@ -1,12 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer components {
-  .button {
-    @apply flex h-10 items-center justify-center rounded-lg px-3 transition-colors hover:bg-zinc-800;
-  }
-  .icon-button {
-    @apply button w-10 px-0;
-  }
-}
