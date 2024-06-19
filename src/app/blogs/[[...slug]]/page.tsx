@@ -2,7 +2,7 @@ import { getPage, getPages } from "@/app/source";
 import type { Metadata } from "next";
 import { DocsPage, DocsBody } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
-import Script from "next/script";
+import GiscusReactions from "../_components/GiscusReactions";
 
 export default async function Page({
   params,
@@ -21,25 +21,8 @@ export default async function Page({
     <DocsPage toc={page.data.exports.toc}>
       <DocsBody>
         <h1>{page.data.title}</h1>
+        {page.slugs.length >= 2 && <GiscusReactions />}
         <MDX />
-        <h2>Reactions</h2>
-        <div className="giscus"></div>
-        <Script
-          src="https://giscus.app/client.js"
-          data-repo="AaronClaes/my-site"
-          data-repo-id="R_kgDOMB3btA"
-          data-category="Giscus Comments"
-          data-category-id="DIC_kwDOMB3btM4CgIzm"
-          data-mapping="pathname"
-          data-strict="0"
-          data-reactions-enabled="1"
-          data-emit-metadata="1"
-          data-input-position="top"
-          data-theme="dark"
-          data-lang="en"
-          crossOrigin="anonymous"
-          async
-        ></Script>
       </DocsBody>
     </DocsPage>
   );

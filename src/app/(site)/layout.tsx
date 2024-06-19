@@ -19,7 +19,13 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
       sidebar={{ enabled: false }}
       links={[
         {
-          text: "X",
+          text: "Blogs",
+          url: "/blogs",
+          type: "main",
+          active: "nested-url",
+        },
+        {
+          text: "X.com",
           url: "https://x.com/aaronclaes",
           icon: <SiX />,
           external: true,
@@ -31,12 +37,6 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
           icon: <SiLinkedin />,
           external: true,
           type: "secondary",
-        },
-        {
-          text: "Blogs",
-          url: "/blogs",
-          type: "main",
-          active: "nested-url",
         },
       ]}
       containerProps={{ className: "h-full" }}

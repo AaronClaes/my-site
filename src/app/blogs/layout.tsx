@@ -13,7 +13,13 @@ export default function RootDocsLayout({ children }: { children: ReactNode }) {
       }}
       links={[
         {
-          text: "X",
+          text: "Blogs",
+          url: "/blogs",
+          type: "main",
+          active: "nested-url",
+        },
+        {
+          text: "@aaronclaes",
           url: "https://x.com/aaronclaes",
           icon: <SiX />,
           external: true,
@@ -25,12 +31,6 @@ export default function RootDocsLayout({ children }: { children: ReactNode }) {
           icon: <SiLinkedin />,
           external: true,
           type: "secondary",
-        },
-        {
-          text: "Blogs",
-          url: "/blogs",
-          type: "main",
-          active: "nested-url",
         },
       ]}
     >
