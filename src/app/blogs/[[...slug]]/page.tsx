@@ -23,6 +23,7 @@ export default async function Page({
         <h1>{page.data.title}</h1>
         {page.slugs.length >= 2 && <GiscusReactions />}
         <MDX />
+        {page.slugs.length >= 2 && <GiscusReactions />}
       </DocsBody>
     </DocsPage>
   );
