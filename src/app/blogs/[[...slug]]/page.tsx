@@ -49,6 +49,11 @@ export function generateMetadata({ params }: { params: { slug?: string[] } }) {
       url: page.url,
       images: [`/blogs/og/${page.file.name}.png`],
     },
-    keywords: page.slugs,
+    keywords: [
+      ...page.slugs,
+      "three.js",
+      "react-three-fiber",
+      "@react-three/fiber",
+    ],
   } satisfies Metadata;
 }
