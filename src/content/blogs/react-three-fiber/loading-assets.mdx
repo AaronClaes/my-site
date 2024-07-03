@@ -1,6 +1,6 @@
 ---
-title: Loading assets in React Three Fiber - Best patterns
-description: Simple & advanced patterns to load assets in React Three Fiber. Loading assets in React Three Fiber is a bit different from regular Three.js. This blog covers the best practices, do's & don'ts and advanced patterns.
+title: Loading assets in React Three Fiber - Zero to Hero
+description: Simple & advanced ways to load assets in React Three Fiber. Loading assets in React Three Fiber is a bit different from regular Three.js. This blog covers the best practices, do's & don'ts and advanced loading strategies.
 ---
 
 import { Callout } from "fumadocs-ui/components/callout";
@@ -25,7 +25,7 @@ import {
 </Callout>
 
 <ImageZoom
-  src="/blogs/r3f/loading-patterns/thumbnail.png"
+  src="/blogs/r3f/loading-assets/thumbnail.png"
   width="1200"
   height="630"
 />
@@ -34,11 +34,11 @@ import {
 
 ### Reason of writing
 
-After using R3F (React Three Fiber) in production for about 2 years, I have learned a lot about loading patterns.
+After using R3F (React Three Fiber) in production for over 2 years, I have learned a lot about loading assets, the best practices and the pitfalls it brings.
 
 A lot of the information is scattered across docs, GitHub & CodeSandboxes, and I want to create a single source of truth on this topic.
 
-By the end of this blog, you will have a deep understanding on how loading assets in React & R3F works, and how to use them to improve the user experience and performance of your applications.
+By the end of this blog, you will have a deep understanding on how loading assets in React & R3F works, and how to use it to improve the user experience and performance of your applications.
 
 ### Target audience
 
@@ -54,34 +54,15 @@ Developers that want to...
 - Basic knowledge of R3F
 - Basic knowledge of React
 
-### Topics covered
-
-This blog answers the **how**, **why** and **when** of loading patterns in R3F.
-
-Including ...
-
-- Bad loading patterns
-- Basic loading patterns
-- Advanced loading patterns
-
-And ...
-
-- Things to look out for
-- Tricks I learned along the way
-- React Three Drei
-
 ## The Three.js way 👎
 
-<Callout type="warn">
-  Please note that the following code snippets are not meant to be used in
-  production. It is solely to demonstrate the problems that can arise.
-</Callout>
+Before we learn the best practices, it is important to understand why we should use them, and what might happen if we don't.
 
-Before we learn the correct way to load assets, let's take a look at the wrong way.
+The first and most important concept to understand is that we are working in React. This sounds obvious, but it requires a fundamentally different mental model compared to Three.js and vanilla JavaScript when it comes to handling async operations. Let's take a closer look 🔍
 
 ### Example
 
-When you just started with R3F, you might have tried something like this:
+When you just started with React & React Three Fiber, you might have tried something like this:
 
 ```tsx
 function MyMesh() {
@@ -102,7 +83,7 @@ At first, nothing seems wrong with this code:
 2. We have a mesh with a `boxGeometry` and a `meshBasicMaterial`
 3. We pass the texture to the `meshBasicMaterial`
 
-And if we run this, it just works as you would expect.
+And if we run the code, it just works as you would expect.
 
 <SandpackThreeTextureLoader />
 
@@ -113,9 +94,9 @@ Now lets take a closer look at what is happening here and why it is so bad.
 In React, components re-render when their props or state changes. This is a fundamental concept in React and is what makes it both powerful and tricky.
 
 Because we are using React components, the rules of re-renders apply to us as well.
-This means that every time the `MyMesh` Component re-renders, `TextureLoader` will be recreated & called again.
+This means that every time the `MyMesh` component re-renders, `TextureLoader` will be recreated & called again.
 
-Let me show you what happens when we add a bit of functionality to our component:
+Lets take a look at what happens when we add a bit more functionality to our component:
 
 ```tsx
 function MyMesh() {
@@ -125,7 +106,7 @@ function MyMesh() {
   const handleClick = () => setScale((p) => p + 0.1); // [!code highlight]
 
   return (
-    <mesh onClick={handleClick} scale={scale}>
+    <mesh /* [!code highlight] */ onClick={handleClick} scale={scale}>
       <boxBufferGeometry />
       <meshBasicMaterial map={texture} />
     </mesh>
@@ -153,38 +134,36 @@ Now you should notice two problems with our application.
 The texture very briefly disappears when the image is being fetched. (throttle your network to see it more clearly)
 
 <ImageZoom
-  src="/blogs/r3f/loading-patterns/no-texture.png"
+  src="/blogs/r3f/loading-assets/no-texture.png"
   width="500"
   height="100"
 />
 
 This indicates that we are creating a new texture on every re-render.
-
 Dont believe me? Try adding a `console.log(texture.uuid)` statement inside `MyMesh` and notice a new uuid being logged in your console.
 
 #### No caching
 
-Our second problem can be spotted inside the network tab of your devtools.
-
+Our second problem can be spotted inside the network tab of the devtools.
 On each click, our `react.webp` image is being refetched.
 
 <ImageZoom
-  src="/blogs/r3f/loading-patterns/network-tab.png"
+  src="/blogs/r3f/loading-assets/network-tab.png"
   width="500"
   height="100"
 />
 
-Not only will this increase the load on your server, but it will also slow down your application.
+Not only will this increase the load on your server, but it will also slow down the application.
 
-Now imagine you have a more complex application, where a texture is being used in by multiple meshes. Each component will create a new texture, and the image will be refetched on every re-render for every component.
+Now imagine you have a more complex application, where a texture is being used by multiple meshes. Each component will create a new texture, and the image will be refetched on every re-render for every component.
 
-In a small application like this, it might not be a big deal, but in a larger and more complex application, this can lead to serious performance issues.
+In a small application like our example, this might not be a big deal, but in a larger and more complex application, it can lead to serious performance issues.
 
-Luckily for us, React & R3F provides us all the tools we need to load assets correctly.
+But do not worry, React & React Three Fiber provides us all the tools we need to load assets correctly.
 
 ## The R3F way 👍
 
-The authors of R3F were clearly aware of the re-render problems and provided us with built in solutions.
+The maintainers of R3F were clearly aware of the re-render problems and provided us with built in solutions. Lets take a look how we can use them.
 
 ### Example
 
@@ -192,7 +171,7 @@ The correct way to load textures in R3F is by using the `useLoader` hook.
 
 ```tsx
 function MyMesh() {
-  const texture = useLoader(THREE.TextureLoader, "path/to/texture.png");
+  const texture = useLoader(THREE.TextureLoader, "path/to/texture.png"); // [!code highlight]
 
   return (
     <mesh>
@@ -225,7 +204,7 @@ Lets recreate our setup from before, where we click on the mesh and the scale in
 ```tsx
 export function MyMesh() {
   const [scale, setScale] = useState(1);
-  const texture = useLoader(THREE.TextureLoader, "path/to/texture.png");
+  const texture = useLoader(THREE.TextureLoader, "path/to/texture.png"); // [!code highlight]
 
   const handleClick = () => setScale((p) => p + 0.1);
 
@@ -240,17 +219,16 @@ export function MyMesh() {
 
 <Callout type="info">
   An important sidenote is that `MyMesh` will still re-render on each click.
-  This is how React works and it is required to display the new scaled mesh.
+  This is how React works and it is required to display the new scaled mesh if
+  you modify it via props.
 </Callout>
 
 <SandpackUseLoader />
 
 Lets open our devtools again, turn off caching and open the network tab.
-
 You will notice that the texture is not being refetched on each click and the texture is not being recreated on each re-render.
 
 Don't take my word for it, add `console.log(texture.uuid)` statement again, click the mesh and notice the same uuid being logged in the console.
-
 As you can see, the magic of the `useLoader` hook allows us to load textures correctly in R3F, without needing to worry about React and its re-renders.
 
 Congratulations! 🥳 You just finished learning the correct method to load assets in React Three Fiber!
@@ -263,6 +241,8 @@ Lets dive a bit deeper into the `useLoader` hook and go over the features it off
 Our two main problems we had with the Three.js way of loading assets are solved by the caching functionality of the `useLoader` hook.
 
 Instead of just caching the file we fetch, everything returned by the loader (that we passed as an argument) is cached. In case of a `TextureLoader` that would be a `Texture`, but the same happens for a `GLTFLoader`, `OBJLoader`, ...
+
+Later on in the blog we will take a look at some examples where this might cause unexpected issues, but for most usecases this is the behavior we want. It is important to remember that creating new instances of Three.js classes can be expensive, so reusing and caching them is great for performance.
 
 To do this, R3F makes use of the [react-suspense](https://github.com/pmndrs/suspend-react/tree/main) library. As the name suggets, it allows R3F to seamlessly integrate with the `Suspense` features offered by React, and integrate caching. Which brings us to the next feature of the `useLoader`.
 
@@ -287,8 +267,8 @@ export function App() {
     <>
       <Navbar />
       <Content />
-      <Suspense fallback={<Spinner />}>
-        <LazyComponent />
+      <Suspense>
+        <LazyComponent /* [!code highlight] */ />
         <OtherComponent />
         <OtherComponentTwo >
       </Suspense>
@@ -310,12 +290,14 @@ The following will happen:
   the DOM.
 </Callout>
 
-In case of React Three Fiber, we cannot display a fallback UI while loading an asset, because rendering HTML elements inside of a `Canvas` is not possible. But that doesn't mean that `Suspense` cannot be useful for us.
+In case of React Three Fiber, we cannot display a fallback UI while loading an asset, because rendering HTML elements inside of a three.js canvas is not possible. But that doesn't mean that `Suspense` cannot be useful for us.
 
 <Callout type="info">
   [Later in this blog](#html) we will learn a way to display UI as a fallback
   anyway, with the `Html` component from Drei.
 </Callout>
+
+So how can `Suspense` be useful to us? Lets take a look.
 
 Everytime `useLoader` loads an **uncached** asset, it will throw a promise, which suspends the application.
 This allows us to have full control over the loading states inside our `Canvas`.
@@ -344,9 +326,9 @@ So why is it there, and what does it do?
 If we go back to our `useLoader` example and refresh it, we notice that we first have a white canvas, and then the cube appears with the texture. It never renders without the texture.
 This is because our `useLoader` suspends the application until the texture is loaded, which means everything inside our `Canvas` is unmounted until the loading is done.
 
-Great right? No flickering textures & everything is loaded before we start rendering. But what if we want to load new assets, when a element is clicked for example?
+Great right? No flickering textures & everything is loaded before we start rendering. But what if we want to load new assets later on, when a element is clicked for example?
 
-You might already know where I am going with this, lets take a look.
+If you used `Supsense` before, you might already know where I am going with this, lets take a look.
 
 First we modify our previous example to include a second cube with a different texture. We now have a `ReactCube` and a `ThreeCube` component.
 To view the `ThreeCube`, we need to click on the `ReactCube`.
@@ -369,9 +351,9 @@ export function MyScene() {
 
 When you click the `ReactCube`, you should notice a problem. If you don't see it, try throttling your network.
 
-The moment you click on the cube, the texture starts loading and everything dissapears for a brief moment, until the texture finished loading.
+The moment you click on the cube, the texture starts loading and everything dissapears for a brief moment, until the loading is finished.
 
-Remember the `Suspense` inside the Canvas? It is the reason why this happens. As we learned before, the `Suspense` unmounts its children until the loading is done, which includes the `ReactCube`.
+Remember the `Suspense` inside the `Canvas`? It is the reason why this happens. As we learned before, the `Suspense` unmounts its children until the loading is done, which includes the `ReactCube`.
 
 To solve this, we need to make sure that only the `ThreeCube` unmounts, since that's the only element related to the loading of the texture.
 
@@ -391,24 +373,22 @@ export function MyScene() {
 }
 ```
 
-Because the promise thrown by `useLoader` is caught by the first `Suspense` up the component three (our `Suspense`), the problem is now fixed.
+Because the promise thrown by `useLoader` is caught by the first `Suspense` up the component tree (our `Suspense`), the problem is now fixed.
 
 <Callout type="warn">
   The `Suspense` needs to be outside of the component that throws the promise.
-  In this case it's the `ThreeCube` component with the `useLoader`.
+  In this case that is the `ThreeCube` component with the `useLoader`.
 </Callout>
 
 <SandpackUseLoaderOnClickSuspense />
 
-Click the cube and notice that `ThreeCube` appears when the texture is finished loading, and the `ReactCube` stays visible.
+Click the cube and notice that `ThreeCube` appears when the texture is finished loading, while the `ReactCube` stays visible.
 
 #### Parallel fetching
 
-If you have some experience as web developer, you might have heard of the waterfall effect. This is when assets are loaded one after another, instead of in parallel.
+If you have experience as a web developer, you might be familiar with the waterfall effect. It happens when assets are loaded one after another, instead of in parallel.
 
-It is something that can slow down the loading time of your applications a lot. `Suspense` can be great to prevent this, but only if used carefully and correctly.
-
-But that is not the only problem `Suspense` can solve. Especially when loading multiple assets, the true power o f`Suspense` becomes clear.
+It is something that can slow down the loading time of your applications by a lot. `Suspense` can be great to prevent this, but only if you use it carefully and correctly. Let's learn how.
 
 **Using the power of Suspense & promises**
 
@@ -435,21 +415,21 @@ function MyScene() {
 }
 
 function MyMesh({ texture }) {
-  const texture = useLoader(THREE.TextureLoader, texture);
+  const map = useLoader(THREE.TextureLoader, texture);
 
   return (
     <mesh>
       <boxGeometry />
-      <meshBasicMaterial map={texture} />
+      <meshBasicMaterial map={map} />
     </mesh>
   );
 }
 ```
 
-Both `MyMesh` components will throw a promise, which will be caught by the `Suspense` component. This will cause both textures to be loaded in parallel.
+Both `MyMesh` components will throw a promise, which will be caught by the `Suspense` component. This will cause both textures to be loaded in parallel. The reason this works is because `Suspense` does not stop looking for promises once it found one. It also checks the remaining children to see if another promise is present.
 
 <ImageZoom
-  src="/blogs/r3f/loading-patterns/parallel.png"
+  src="/blogs/r3f/loading-assets/parallel.png"
   width="1773"
   height="463"
 />
@@ -506,9 +486,10 @@ So what happens is:
 3. The promise is fulfilled and the children are mounted again.
 4. `MyGroup` renders
 5. `MyMesh` throws a promise
+6. ...
 
 <ImageZoom
-  src="/blogs/r3f/loading-patterns/waterfall.png"
+  src="/blogs/r3f/loading-assets/waterfall.png"
   width="1773"
   height="463"
 />
@@ -555,12 +536,14 @@ What happens is:
 4. `MyGroup` throws a promise for the second `useLoader`
 
 <ImageZoom
-  src="/blogs/r3f/loading-patterns/waterfall.png"
+  src="/blogs/r3f/loading-assets/waterfall.png"
   width="1773"
   height="463"
 />
 
-So what is the solution? Either structure your component similar to the first example we looked at, or make use of the solution built in `useLoader`.
+So what is the solution?
+
+You have to either structure your component similar to the first example we looked at, or make use of the solution built in `useLoader`.
 
 **Multiple assets**
 
@@ -609,11 +592,11 @@ However it is important to remember that `Suspense` will only work great if used
 
 <Callout type="info">
   I highly recommend to regularly open your devtools and check the network tab,
-  throttle your network and see how your assets are loaded. I am sure you will
+  throttle your network and see how your assets are loading. I am sure you will
   notice some things you did not expect.
 </Callout>
 
-Unfortunately, `Suspense` on its own is not a perfect solution for all usecases. Lets dive into some more advanced loading patterns where its problems become more clear, and how we can solve them.
+Unfortunately, `Suspense` on its own is not a perfect solution for all usecases. Lets dive into some more advanced loading strategies where its problems become more clear, and how we can solve them.
 
 ### React 18 hooks
 
@@ -655,7 +638,7 @@ We have an array with 5 different textures, and a `MyMesh` component that allows
 <SandpackUseLoaderSwitchTexture />
 
 Click the cube a few times and notice the problem. The cube disappears while a new image is being fetched.
-This happens because `useLoader` doesn't only throw a promise when the first texture loads. Each uncached texture will throw a promise.
+This happens because `useLoader` doesn't only throw a promise when the first texture loads. Each uncached texture will throw a promise. Which causes the `Suspense` to unmount its children.
 
 If you click a few more times until the cycle restarts, you notice that the problem does no longer occur. The textures are now cached and can be displayed instantly without throwing a promise.
 
@@ -728,7 +711,7 @@ It is quiet a bit of extra code, but it does the job. Lets take a look at the re
 
 <SandpackUseLoaderSwitchTextureUseTransition />
 
-When you click the cube, the old texture stays visible until the new texture is loaded. This is a great improvement over the flickering textures we had before.
+When you click the cube, the old texture stays visible until the new texture is fully loaded. This is a great improvement over the flickering textures we had before.
 
 The user experience is now exactly how we want it to be, but the code has gotten quiet a bit more complex.
 This is why I personally prefer not to use `useTransition` for this usecase, because `useDeferredValue` allows us to achieve the same result with way less code and complexity.
@@ -751,7 +734,7 @@ To use it, we can go back to our original `MyMesh` component and apply a few sma
 function MyMesh() {
   const [textureIndex, setTextureIndex] = useState(0);
   const mapPath = useDeferredValue(maps[textureIndex]); // [!code highlight]
-  const texture = useLoader(THREE.TextureLoader, mapPath);
+  const texture = useLoader(THREE.TextureLoader, mapPath); // [!code highlight]
 
   return (
     <mesh
@@ -791,16 +774,23 @@ Lets continue learning more awesome features of the `useLoader` hook & React!
 
 Sometimes, it's preferable that an asset is available before it is actually needed. This is where preloading comes in.
 
-This pattern does not require you to make any changes. It is a method build in the `useLoader` hook.
+This pattern does not require you to make any changes. It is just a method built into the `useLoader` hook.
 To preload something, you simply call the preload method on the `useLoader` hook, with the path(s) that you want to preload.
 
 ```tsx
 useLoader.preload(THREE.TextureLoader, "/path/to/texture.png");
 ```
 
+```tsx
+useLoader.preload(THREE.TextureLoader, [
+  "/path/to/texture1.png",
+  "/path/to/texture2.png",
+]);
+```
+
 If you want the texture to be available from the start, place the preload call outside of your component.
 This will make sure the texture loads during the initial suspend of the `Canvas`, so it is available when you need it.
-In the end, it is just Javascript so you can preload assets whenever you want, even outside of the React lifecycle.
+In the end, it is just JavaScript, so you can preload assets whenever you want, even outside of the React lifecycle.
 
 When and what you preload is up to your usecase. Some apps will benefit from a longer initial loading time, while others might want to load assets on demand.
 
@@ -809,7 +799,7 @@ For example:
 - Games are expected to have an initial loading time, so preloading assets is a good idea.
 - Web apps are expected to load fast, so preloading (too much) assets might not be a good idea.
 
-The main loading patterns are now covered. You learned how to load assets correctly, how to handle loading states and how to preload assets. But we are not done yet.
+The main loading strategies are now covered. You learned how to load assets correctly, how to handle loading states and how to preload assets. But we are not done yet.
 
 In the next chapters of this blog, I will go over more useful features of the `useLoader` hook, a library that makes loading assets even easier, and some general tips, tricks and pitfalls to look out for.
 
@@ -888,6 +878,8 @@ useLoader(THREE.TextureLoader, "/path/to/texture.png", (loader) => {
 
 It is important to remember that the assets returned by `useLoader` are cached references. This means that if you mutate the asset, it will be mutated for all components that use the same asset.
 
+Lets take a look at a code example.
+
 ```tsx
 function MaterialRepeat2() {
   const texture = useLoader(THREE.TextureLoader, "/path/to/texture.png");
@@ -945,7 +937,7 @@ const clonedTexture = texture.clone();
 
 Keep in mind that this can still cause tricky situations. For example, if a component with a none cloned texture renders first, and a component with a cloned texture renders second, the cloned texture will include the changes made to the none cloned texture.
 
-This is basic Javascript behavior, but it is important to keep in mind when working with cached assets.
+This is basic JavaScript behavior, but it is important to keep in mind when working with cached assets.
 
 A hackish way to prevent the mutation problems is to pass a version number to the path. This way, the path is unique and the textures are cached separately.
 Keep in mind that this is not a recommended solution, since the image will be fetched multiple times. But in some very rare cases it might be a good temporary solution to quickly fix an issue.
@@ -960,7 +952,7 @@ useLoader(THREE.TextureLoader, `/path/to/texture.png?v=1`);
 
 ### Conclusion
 
-Congratulations! 🥳 You just finished learning about loading patterns in React Three Fiber. I know it was a lot, and don't worry if not everything clicked from the first time.
+Congratulations! 🥳 You just finished learning about loading strategies in React Three Fiber. I know it was a lot, and don't worry if not everything clicked from the first time.
 Once you start using these patterns inside your applications, it will get easier to understand.
 
 The next chapter takes us into the world of Drei, where we will learn about hooks and components that make loading assets even easier, while still applying the patterns we just learned. Lets dive in!
@@ -982,7 +974,7 @@ Drei has many components and hooks, but in this blog we will focus on those that
 
 ### Loading hooks
 
-Each type of asset requires a different strategy to load. The `useLoader` hook is fine, but it is not always the best solution out of the box. Drei provides us with custom hooks for the most popular asset types.
+Each type of asset requires a different strategy to load. The `useLoader` hook is fine, but it is not always the best solution out of the box. Drei provides us with custom hooks for the most common asset types.
 
 These hooks are built ontop of the `useLoader` hook, but take specific arguments relevant to the asset type. Lets take a look at a few examples.
 
@@ -1012,6 +1004,8 @@ Preloading & clearing with `useTexture` works exactly the same:
 useTexture.preload("path/to/texture.png");
 useTexture.clear("path/to/texture.png");
 ```
+
+Also notice that we no longer need to pass the `TextureLoader`, it is built into the hook itself.
 
 #### useGLTF
 
@@ -1065,7 +1059,7 @@ More info in [the docs](https://github.com/pmndrs/drei?tab=readme-ov-file#splat)
 
 ### Loading state
 
-Most of us probably played games at some point in our life. Doesnt matter if it is on mobile, console or PC. Every game has one thing in common. When you first launch them, a loading screen will be displayed.
+Most of us probably played games at some point in our life. Doesnt matter if it is on mobile, console or PC, every game has one thing in common. When you first launch them, a loading screen will be displayed.
 
 Thanks to Drei, we can easily do this as well, either with a pre-made or a custom one.
 
@@ -1092,7 +1086,7 @@ It will display a loading overlay like the one bellow, whenever a promise is thr
 </Callout>
 
 <ImageZoom
-  src="/blogs/r3f/loading-patterns/loading-screen.png"
+  src="/blogs/r3f/loading-assets/loading-screen.png"
   width="500"
   height="100"
 />
@@ -1143,7 +1137,7 @@ Luckily for us, Drei solves this problem with the `Html` component.
 
 #### Html
 
-The `Html` component allows you to render HTML elements inside the `Canvas`. This is perfect for creating a custom loading screen.
+The `Html` component allows you to render HTML elements from within the `Canvas`. This is perfect for creating a custom loading screen.
 
 Here is an example:
 
@@ -1218,6 +1212,6 @@ This is a very basic example, but I think you can imagine how powerful this libr
 
 ## The end
 
-If you made it this far, congratulations! 🥳 I hope you learned something new and will impletement some of the things I showed in your applications!
+If you made it this far, congratulations! 🥳 I hope you learned something new and will impletement it into your applications!
 
 If you have any questions, feedback or topics for future posts, feel free to leave a comment or reach out to me on [**X**](https://x.com/aaronclaes), I am always happy to hear from you!
