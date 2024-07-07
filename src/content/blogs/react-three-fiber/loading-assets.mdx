@@ -70,7 +70,7 @@ function MyMesh() {
 
   return (
     <mesh>
-      <boxBufferGeometry />
+      <boxGeometry />
       <meshBasicMaterial map={texture} />
     </mesh>
   );
@@ -107,7 +107,7 @@ function MyMesh() {
 
   return (
     <mesh /* [!code highlight] */ onClick={handleClick} scale={scale}>
-      <boxBufferGeometry />
+      <boxGeometry />
       <meshBasicMaterial map={texture} />
     </mesh>
   );
@@ -175,7 +175,7 @@ function MyMesh() {
 
   return (
     <mesh>
-      <boxBufferGeometry />
+      <boxGeometry />
       <meshBasicMaterial map={texture} />
     </mesh>
   );
