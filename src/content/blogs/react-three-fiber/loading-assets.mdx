@@ -812,22 +812,19 @@ The `useLoader` hook also has a `clear` method that allows you to clear all or
 specific items from the cache. It can be great when you want to free up
 memory.
 
-Clear all the items from the cache:
-
-```tsx
-useLoader.clear();
-```
-
 Clear a specific item from the cache:
 
 ```tsx
-useLoader.clear("/path/to/texture.png");
+useLoader.clear(THREE.TextureLoader, "/path/to/texture.png");
 ```
 
 Clear multiple specific items from the cache:
 
 ```tsx
-useLoader.clear(["/path/to/texture1.png", "/path/to/texture2.png"]);
+useLoader.clear(THREE.TextureLoader, [
+  "/path/to/texture1.png",
+  "/path/to/texture2.png",
+]);
 ```
 
 #### Primitives
@@ -998,7 +995,7 @@ const texture = useTexture("path/to/texture.png", (texture) => {
 });
 ```
 
-Preloading & clearing with `useTexture` works exactly the same:
+Preloading & clearing with `useTexture` works exactly the same, but without the loader:
 
 ```tsx
 useTexture.preload("path/to/texture.png");
