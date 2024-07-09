@@ -986,7 +986,11 @@ We have been loading textures throughout this blog, so it is only fair we mentio
 
 The reason you would want to you use `useTexture` over `useLoader` is that it takes care of precompiling.
 
-But why would we benefit from this? Three.js by default uploads the texture to the GPU when it is visible for the renderer. Which means that when the texture is behind the camera, it will not compile until it is actually seen by the camera.
+But why would we benefit from this? Three.js by default uploads the texture to the GPU when it is visible for the renderer. Which means that when the texture is behind the camera, it will not compile until it is actually seen by the camera. `useTexture` fixes this by doing the following for the loaded textures:
+
+```tsx
+gl.initTexture(texture);
+```
 
 (Thank you [@0xca0a](https://x.com/0xca0a) for pointing this out to me!)
 
