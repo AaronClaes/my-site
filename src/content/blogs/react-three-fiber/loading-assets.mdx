@@ -971,9 +971,9 @@ Drei has many components and hooks, but we will focus on those that help us load
 
 ### Loading hooks
 
-Each type of asset requires a different strategy to load. The `useLoader` hook is fine, but it is not always the best solution out of the box. Drei provides us with custom hooks for the most common asset types.
+Some asset types would benefit from extra features that are not part of the `useLoader` hook. For those asset types, Drei offers custom hooks.
 
-These hooks are built on top of the `useLoader` hook, but take specific arguments relevant to the asset type. Let's take a look at a few examples.
+The hooks are built on top of the `useLoader` hook, but with some specific improvements. Let's take a look at a few examples.
 
 <Callout type="info">
   Because most loader hooks in Drei are wrappers around `useLoader`, everything
@@ -984,18 +984,13 @@ These hooks are built on top of the `useLoader` hook, but take specific argument
 
 We have been loading textures throughout this blog, so it is only fair we mention the `useTexture` hook first.
 
-When loading a texture, you often need to apply changes. It could be wrapping, repeating, anisotropy, etc. To make this more convenient, `useTexture` has a second argument that allows you to pass a callback function.
+The reason you would want to you use `useTexture` over `useLoader` is that it takes care of precompiling.
 
-The callback function gives access to the loaded texture so you can apply changes.
+But why would we benefit from this? Three.js by default uploads the texture to the GPU when it is visible for the renderer. Which means that when the texture is behind the camera, it will not compile until it is actually seen by the camera.
 
-```tsx
-const texture = useTexture("path/to/texture.png", (texture) => {
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(2, 2);
-});
-```
+(Thank you [@0xca0a](https://x.com/0xca0a) for pointing this out to me!)
 
-Preloading & clearing with `useTexture` works exactly the same, but without the loader:
+Preloading & clearing with `useTexture` works exactly the same:
 
 ```tsx
 useTexture.preload("path/to/texture.png");
@@ -1006,7 +1001,9 @@ Also, notice that we no longer need to pass the `TextureLoader`. It is built int
 
 #### useGLTF
 
-The `useGLTF` hook loads `.glb` and `.gltf` files. It takes care of Draco compression for you as well.
+The `useGLTF` hook loads `.glb` and `.gltf` files. The reason you would want to use it over `useLoader` is because some of your models might have draco and meshopt compression. Custom logic is required to support this with `useLoader`, but luckily `useGLTF` has this built in.
+
+You can use the compressed models like any other model:
 
 ```tsx
 const model = useGLTF("path/to/model.glb");
@@ -1024,7 +1021,9 @@ useGLTF.clear("path/to/module.glb");
 
 Other loader hooks offered by Drei are `useFBX`, `useKTX2`, `useCubeTexture`, ...
 
-Not all are based on `useLoader`, so to check out the [Drei docs](https://github.com/pmndrs/drei?tab=readme-ov-file#loader) for more info.
+All the hooks have extra built-in features that are useful for common situations. I recommend checking out their source code, not only because it tells you what they do, but also because it is a great way to learn about React Three Fiber.
+
+Not all hooks are based on `useLoader`, so make sure to check out the [Drei docs](https://github.com/pmndrs/drei?tab=readme-ov-file#loader) for more info.
 
 ### Loading components
 
