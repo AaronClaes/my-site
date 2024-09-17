@@ -1027,7 +1027,7 @@ Other loader hooks offered by Drei are `useFBX`, `useKTX2`, `useCubeTexture`, ..
 
 All the hooks have extra built-in features that are useful for common situations. I recommend checking out their source code, not only because it tells you what they do, but also because it is a great way to learn about React Three Fiber.
 
-Not all hooks are based on `useLoader`, so make sure to check out the [Drei docs](https://github.com/pmndrs/drei?tab=readme-ov-file#loader) for more info.
+Not all hooks are based on `useLoader`, so make sure to check out the [Drei docs](https://drei.docs.pmnd.rs/loaders/cube-texture-use-cube-texture) for more info.
 
 ### Loading components
 
@@ -1035,7 +1035,7 @@ In case you simply want to load an asset without needing to apply advanced chang
 
 #### Gltf
 
-More info in [the docs](https://github.com/pmndrs/drei?tab=readme-ov-file#gltf).
+More info in [the docs](https://drei.docs.pmnd.rs/loaders/gltf-use-gltf).
 
 ```tsx
 <Gltf src="/path/to/model.glb" receiveShadow castShadow />
@@ -1043,7 +1043,7 @@ More info in [the docs](https://github.com/pmndrs/drei?tab=readme-ov-file#gltf).
 
 #### SVG
 
-More info in [the docs](https://github.com/pmndrs/drei?tab=readme-ov-file#svg).
+More info in [the docs](https://drei.docs.pmnd.rs/abstractions/svg#svg).
 
 ```tsx
 <Svg src={urlOrRawSvgString} />
@@ -1051,7 +1051,7 @@ More info in [the docs](https://github.com/pmndrs/drei?tab=readme-ov-file#svg).
 
 #### Splat
 
-More info in [the docs](https://github.com/pmndrs/drei?tab=readme-ov-file#splat).
+More info in [the docs](https://drei.docs.pmnd.rs/abstractions/splat).
 
 ```tsx
 <Splat src="https://huggingface.co/cakewalk/splat-data/resolve/main/nike.splat" />
@@ -1067,7 +1067,7 @@ Thanks to Drei, we can easily do this ourselves, either with a pre-made or a cus
 
 The easiest way to display a loading screen is by using the `Loader` component from Drei.
 
-As shown in [the docs](https://github.com/pmndrs/drei/tree/master?tab=readme-ov-file#loader), this is how you can use it:
+As shown in [the docs](https://drei.docs.pmnd.rs/loaders/loader), this is how you can use it:
 
 ```tsx
 <Canvas>
@@ -1082,7 +1082,7 @@ It will display a loading overlay like the one underneath, whenever a promise is
 
 <Callout type="info">
   The `Loader` has basic customization options that you can find in [the
-  docs](https://github.com/pmndrs/drei/tree/master?tab=readme-ov-file#loader).
+  docs](https://drei.docs.pmnd.rs/loaders/loader).
 </Callout>
 
 <ImageZoom
